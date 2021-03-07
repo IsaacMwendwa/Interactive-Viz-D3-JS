@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html lang="en">
+<head>
+    <title>Visualization Programming Using D3.js</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  
+  
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+  
+    <style>
+        /* Remove the navbar's default margin-bottom and rounded borders */ 
+        .navbar {
+            margin-bottom: 0;
+            border-radius: 0;
+        }
+
+        /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+        .row.content {height: 450px}
+
+        /* Set gray background color and 100% height */
+        .sidenav {
+            padding-top: 20px;
+            background-color: #f1f1f1;
+            height: 100%;
+        }
+
+        /* Set black background color, white text and some padding */
+        footer {
+            background-color: #555;
+            color: white;
+            padding: 15px;
+        }
+
+        /* On small screens, set height to 'auto' for sidenav and grid */
+        @media screen and (max-width: 767px) {
+            .sidenav {
+            height: auto;
+            padding: 15px;
+            }
+            .row.content {height:auto;} 
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">Visualization Programming using D3.js</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+    </div>
+  </div>
+</nav>
+  
+<div class="container-fluid text-center">    
+  <div class="row content">
+    <div class="col-sm-2 sidenav">
+      <p><b>Background Information</b></p>
+      <p>
+    </div>
+
+    <div class="col-sm-8 text-left"> 
+        <h1>Visualization Programming using D3.js: Density Plot</h1>
+
+     <!-- Create a div where the graph will take place -->
+    <div id="my_dataviz">
+
+        <script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 30, right: 30, bottom: 30, left: 50},
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// get the data
+d3.csv("https://raw.githubusercontent.com/IsaacMwendwa/dataViz/main/a1-mutualfunds.csv", function(data) {
+
+  // Defining graph title and axis labels
+  const xAxisLabel = "Expense_ratio";
+  const yAxisLabel = "Density";
+  const title = `Density Plot of ${xAxisLabel}`;
+
+  //Create Title 
+  svg.append("text")
+    .attr("x", width / 2 )
+    .attr("y", 0)
+    .style("text-anchor", "middle")
+    .text(title);
+
+  //Create X axis label   
+  svg.append("text")
+    .attr("x", width / 2 )
+    .attr("y",  height + margin.bottom)
+    .style("text-anchor", "middle")
+    .text(xAxisLabel);
+
+  //Create Y axis label
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0-margin.left)
+    .attr("x",0 - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text(yAxisLabel);  
+  
+
+  // List of groups
+  var allGroup = d3.map(data, function(d){return(d.Category)}).keys()
+
+  // add the options to the button
+  d3.select("#selectButton")
+    .selectAll('myOptions')
+    .data(allGroup)
+    .enter()
+    .append('option')
+    .text(function (d) { return d; }) // text showed in the menu
+    .attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+  // add the x Axis
+  var x = d3.scaleLinear()
+    .domain([0, 5])
+    .range([0, width]);
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  // add the y Axis
+  var y = d3.scaleLinear()
+            .range([height, 0])
+            .domain([0, 0.4]);
+  svg.append("g")
+      .call(d3.axisLeft(y));
+
+  // Compute kernel density estimation for the first group called Setosa
+  var kde = kernelDensityEstimator(kernelEpanechnikov(3), x.ticks(140))
+  var density =  kde( data
+    .filter(function(d){ return d.Category == "International Stocks"})
+    .map(function(d){  return +d.Expense_ratio; })
+  )
+
+  // Plot the area
+  var curve = svg
+    .append('g')
+    .append("path")
+      .attr("class", "mypath")
+      .datum(density)
+      .attr("fill", "#69b3a2")
+      .attr("opacity", ".8")
+      .attr("stroke", "#000")
+      .attr("stroke-width", 1)
+      .attr("stroke-linejoin", "round")
+      .attr("d",  d3.line()
+        .curve(d3.curveBasis)
+          .x(function(d) { return x(d[0]); })
+          .y(function(d) { return y(d[1]); })
+      );
+
+  // A function that update the chart when slider is moved?
+  function updateChart(selectedGroup) {
+    // recompute density estimation
+    kde = kernelDensityEstimator(kernelEpanechnikov(3), x.ticks(40))
+    var density =  kde( data
+      .filter(function(d){ return d.Category == selectedGroup})
+      .map(function(d){  return +d.Expense_ratio; })
+    )
+
+    // update the chart
+    curve
+      .datum(density)
+      .transition()
+      .duration(1000)
+      .attr("d",  d3.line()
+        .curve(d3.curveBasis)
+          .x(function(d) { return x(d[0]); })
+          .y(function(d) { return y(d[1]); })
+      );
+  }
+
+  // Listen to the slider?
+  d3.select("#selectButton").on("change", function(d){
+    selectedGroup = this.value
+    updateChart(selectedGroup)
+  })
+
+});
+
+
+// Function to compute density
+function kernelDensityEstimator(kernel, X) {
+  return function(V) {
+    return X.map(function(x) {
+      return [x, d3.mean(V, function(v) { return kernel(x - v); })];
+    });
+  };
+}
+function kernelEpanechnikov(k) {
+  return function(v) {
+    return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
+  };
+}
+
+</script>
+
+<!-- Initialize a select button -->
+<select id="selectButton"></select>
+        
+    </div>
+
+    <div class="col-sm-8 text-left">
+        <h3>Description of Findings</h3>
+        <p>thshsh fdujd vhc hgjks </p>
+    </div>
+    </div>
+    <div class="col-sm-2 sidenav">
+      <div class="well">
+        <p><b>Visualizations used</b></p>
+        <p><a href=index.html>Bubble Plot</a></p>
+        <p><a href=scatter_plot.html>Scatter Plot</a></p>
+        <p><a href=histogram.html>Histogram</a></p>
+        <p><a href=heatmap.html>Heatmap</a></p>
+        <p><a href=#>Density Plot</a></p>
+      </div>
+      <div class="well">
+        <p><b>Interactivity</b></p>
+        <p>The visualizations provide various forms of interactivity to the user, including
+        tooltips by hovering the mouse over a cell, adjusting x-axis, changing categories to visualize </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid text-center">
+  <p>Visualization Programming using D3.js</p>
+</footer>
+</body>
+</html>
