@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html lang="en">
+<head>
+    <title>Visualization Programming Using D3.js</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  
+    <!-- Load d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+    
+  
+    <style>
+        /* Remove the navbar's default margin-bottom and rounded borders */ 
+        .navbar {
+            margin-bottom: 0;
+            border-radius: 0;
+        }
+
+        /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+        .row.content {height: 450px}
+
+        /* Set gray background color and 100% height */
+        .sidenav {
+            padding-top: 20px;
+            background-color: #f1f1f1;
+            height: 100%;
+        }
+
+        /* Set black background color, white text and some padding */
+        footer {
+            background-color: #555;
+            color: white;
+            padding: 15px;
+        }
+
+        /* On small screens, set height to 'auto' for sidenav and grid */
+        @media screen and (max-width: 767px) {
+            .sidenav {
+            height: auto;
+            padding: 15px;
+            }
+            .row.content {height:auto;} 
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">Visualization Programming using D3.js</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+    </div>
+  </div>
+</nav>
+  
+<div class="container-fluid text-center">    
+  <div class="row content">
+    <div class="col-sm-2 sidenav">
+      <p><b>Background Information</b></p>
+      <p>Data Source: a1-cereals.csv</p>
+      <p>The histogram in this page allows for interactivity, by having functionality for
+      the user to change the number of bins in the histogram</p>
+      <p>This also allows the user to have a closer inspection and hence finding meaningful insights/patterns from the dataset</p>
+    </div>
+
+    <div class="col-sm-8 text-left"> 
+        <h1>Visualization Programming using D3.js: Histogram</h1>
+
+     <!--div where the graph will take place -->
+    <div id="my_dataviz">
+        <script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 10, right: 30, bottom: 30, left: 40},
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// get the data
+d3.csv("https://raw.githubusercontent.com/IsaacMwendwa/dataViz/main/a1-cereals.csv", function(data) {
+
+    // Defining graph title and axis labels
+    const xAxisLabel = "Calories";
+    const yAxisLabel = "Frequency";
+    const title = `Histogram of ${xAxisLabel} present in Various Cereals`;
+
+    // X axis: scale and draw:
+    var x = d3.scaleLinear()
+        .domain([0, 200])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
+        .range([0, width]);
+    svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
+
+    // Y axis: initialization
+    var y = d3.scaleLinear()
+        .range([height, 0]);
+    var yAxis = svg.append("g")
+
+    
+    //Create Title 
+    svg.append("text")
+        .attr("x", width / 2 )
+        .attr("y", 0)
+        .style("text-anchor", "middle")
+        .text(title);
+
+    //Create X axis label   
+    svg.append("text")
+        .attr("x", width / 2 )
+        .attr("y",  height + margin.bottom)
+        .style("text-anchor", "middle")
+        .text(xAxisLabel);
+
+    //Create Y axis label
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 0-margin.left)
+        .attr("x",0 - (height / 2))
+        .attr("dy", "1em")
+        .style("text-anchor", "middle")
+        .text(yAxisLabel);  
+
+
+    // A function that builds the graph for a specific value of bin
+    function update(nBin) {
+
+    // set the parameters for the histogram
+    var histogram = d3.histogram()
+        .value(function(d) { return d.Calories; })   // I need to give the vector of value
+        .domain(x.domain())  // then the domain of the graphic
+        .thresholds(x.ticks(nBin)); // then the numbers of bins
+
+    // And apply this function to data to get the bins
+    var bins = histogram(data);
+
+    // Y axis: update now that we know the domain
+    y.domain([0, d3.max(bins, function(d) { return d.length; })]);   // d3.hist has to be called before the Y axis obviously
+    yAxis
+        .transition()
+        .duration(1000)
+        .call(d3.axisLeft(y));
+
+    // Join the rect with the bins data
+    var u = svg.selectAll("rect")
+        .data(bins)
+
+    // Manage the existing bars and eventually the new ones:
+    u
+        .enter()
+        .append("rect") // Add a new rect for each new elements
+        .merge(u) // get the already existing elements as well
+        .transition() // and apply changes to all of them
+        .duration(1000)
+            .attr("x", 1)
+            .attr("transform", function(d) { return "translate(" + x(d.x0) + "," + y(d.length) + ")"; })
+            .attr("width", function(d) { return x(d.x1) - x(d.x0) -1 ; })
+            .attr("height", function(d) { return height - y(d.length); })
+            .style("fill", "#69b3a2")
+
+
+    // If less bar in the new histogram, I delete the ones not in use anymore
+    u
+        .exit()
+        .remove()
+
+    }
+
+
+    // Initialize with 20 bins
+    update(20)
+
+
+    // Listen to the button -> update if user change it
+    d3.select("#nBin").on("input", function() {
+    update(+this.value);
+    });
+
+});
+</script>
+
+<p>
+  <label>Change Number of Bins</label>
+  <input type="number" min="20" max="100" step="10" value="20" id="nBin">
+</p>
+
+    </div>
+
+    <div class="col-sm-8 text-left">
+        <h3>Description of Findings</h3>
+        <p>The result of plotting a histogram of calories present in various cereals in the given dataset is that
+        most cereals have their calories count between 90 and 130; as depicted by the high frequencies of the corresponding bins</p>
+        <p>When we increase the number of bins from 20 to 50, we find that a large number of cereals have their calories count at around 110 </p>
+    </div>
+    </div>
+    <div class="col-sm-2 sidenav">
+      <div class="well">
+        <p><b>Visualizations used</b></p>
+        <p><a href=index.html>Bubble Plot</a></p>
+        <p><a href=scatter_plot.html>Scatter Plot</a></p>
+        <p><a href=#>Histogram</a></p>
+        <p><a href=heatmap.html>Heatmap</a></p>
+        <p><a href=density_plot.html>Density Plot</a></p>
+      </div>
+      <div class="well">
+        <p><b>Interactivity</b></p>
+        <p>The visualizations provide various forms of interactivity to the user, including
+        tooltips by hovering the mouse over a cell, adjusting X-axis limits, changing bins/categories to visualize </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="container-fluid text-center">
+  <p>Visualization Programming using D3.js</p>
+</footer>
+</body>
+</html>
