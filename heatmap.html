@@ -99,7 +99,7 @@
                 "translate(" + margin.left + "," + margin.top + ")");
 
         //Read the data
-        d3.csv("https://raw.githubusercontent.com/IsaacMwendwa/dataViz/main/a1-film.csv", function(data) {
+        d3.csv("https://raw.githubusercontent.com/karthikkakarla9/dataViz/main/a1-film.csv", function(data) {
 
           // Labels of row and columns -- Year and Subject of movie
           var mySubjects = d3.map(data, function(d){return d.Subject;}).keys()
