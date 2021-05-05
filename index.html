@@ -17,7 +17,7 @@
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
    
-    <!-- CSS: Change stroke color of circle on hover (white -> black) -->
+    <!-- A bit of CSS: change stroke color of circle on hover (white -> black) -->
     <style>
         .bubbles {
         stroke-width: 2px;
@@ -83,10 +83,7 @@
   <div class="row content">
     <div class="col-sm-2 sidenav">
       <p><b>Background Information</b></p>
-      <p>Data Source: a1-cars.csv</p>
-      <p>Please hover the cursor over any bubble to get its tooltip information</p>
-      <p>The tooltip information consists of the Name of the car, its Manufacturer,
-      and its Country/Region of Origin</p>
+      <p>
     </div>
 
     <div class="col-sm-8 text-left"> 
@@ -111,7 +108,7 @@
                     "translate(" + margin.left + "," + margin.top + ")");
 
             //Read the data
-            d3.csv("https://raw.githubusercontent.com/karthikkakarla9/dataViz/main/a1-cars.csv", function(data) {
+            d3.csv("https://raw.githubusercontent.com/IsaacMwendwa/dataViz/main/a1-cars.csv", function(data) {
 
             // Defining graph title and axis labels
             const xAxisLabel = "Horsepower";
@@ -221,12 +218,7 @@
 
     <div class="col-sm-8 text-left">
         <h3>Description of Findings</h3>
-        <p>The size of the bubble depicts the Miles Per Gallon (MPG) of fuel, which is a measure of fuel efficiency i.e
-            the more Miles Per Gallon, the more fuel efficient the car is. Thus, the bigger the bubble, the higher the fuel efficiency of the car</p>
-        <p>The bubble plot shows that cars of American origin are the least efficient in terms
-        of fuel efficiency, as depicted by the many small green dots in the plot.</p>
-        <p>Moreover, European cars have the most efficient engines, closely followed by cars of Japanese origin. European cars 
-        also have the fastest acceleration for a given horsepower</p>
+        <p>thshsh fdujd vhc hgjks </p>
     </div>
     </div>
     <div class="col-sm-2 sidenav">
@@ -241,7 +233,7 @@
       <div class="well">
         <p><b>Interactivity</b></p>
         <p>The visualizations provide various forms of interactivity to the user, including
-        tooltips by hovering the mouse over a cell, adjusting X-axis limits, changing bins/categories to visualize </p>
+        tooltips by hovering the mouse over a cell, adjusting x-axis, changing categories to visualize </p>
       </div>
     </div>
   </div>
