@@ -68,191 +68,168 @@
   <div class="row content">
     <div class="col-sm-2 sidenav">
       <p><b>Background Information</b></p>
-      <p>Dataset: a1-mutualfunds.csv</p>
-      <p>A density plot is used to plot the distribution of a variable. It is a smoothed 
-        version of an histogram, and it uses the kernel density estimate to show the probability
-        density function of the variable.
-      </p>
-      <p>To explore the interactivity in this plot, please change the Category of the 
-        mutual funds using the radio button presented below the graph
-      </p>
+      <p>
     </div>
 
     <div class="col-sm-8 text-left"> 
         <h1>Visualization Programming using D3.js: Density Plot</h1>
 
-      <!-- Create a div where the graph will take place -->
-      <div id="my_dataviz">
+     <!-- Create a div where the graph will take place -->
+    <div id="my_dataviz">
 
-          <script>
-            // set the dimensions and margins of the graph
-            var margin = {top: 30, right: 30, bottom: 30, left: 50},
-                width = 460 - margin.left - margin.right,
-                height = 400 - margin.top - margin.bottom;
+        <script>
 
-            // append the svg object to the body of the page
-            var svg = d3.select("#my_dataviz")
-              .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-              .append("g")
-                .attr("transform",
-                      "translate(" + margin.left + "," + margin.top + ")");
+// set the dimensions and margins of the graph
+var margin = {top: 30, right: 30, bottom: 30, left: 50},
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
 
-            // get the data
-            d3.csv("https://raw.githubusercontent.com/karthikkakarla9/dataViz/main/a1-mutualfunds.csv", function(data) {
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
 
-              // Defining graph title and axis labels
-              const xAxisLabel = "Expense_ratio";
-              const yAxisLabel = "Density";
-              const title = `Kernel Density Plot of ${xAxisLabel}`;
+// get the data
+d3.csv("https://raw.githubusercontent.com/IsaacMwendwa/dataViz/main/a1-mutualfunds.csv", function(data) {
 
-              //Create Title 
-              svg.append("text")
-                .attr("x", width / 2 )
-                .attr("y", 0)
-                .style("text-anchor", "middle")
-                .text(title);
+  // Defining graph title and axis labels
+  const xAxisLabel = "Expense_ratio";
+  const yAxisLabel = "Density";
+  const title = `Density Plot of ${xAxisLabel}`;
 
-              //Create X axis label   
-              svg.append("text")
-                .attr("x", width / 2 )
-                .attr("y",  height + margin.bottom)
-                .style("text-anchor", "middle")
-                .text(xAxisLabel);
+  //Create Title 
+  svg.append("text")
+    .attr("x", width / 2 )
+    .attr("y", 0)
+    .style("text-anchor", "middle")
+    .text(title);
 
-              //Create Y axis label
-              svg.append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 0-margin.left)
-                .attr("x",0 - (height / 2))
-                .attr("dy", "1em")
-                .style("text-anchor", "middle")
-                .text(yAxisLabel);  
-              
+  //Create X axis label   
+  svg.append("text")
+    .attr("x", width / 2 )
+    .attr("y",  height + margin.bottom)
+    .style("text-anchor", "middle")
+    .text(xAxisLabel);
 
-              // List of groups
-              var allGroup = d3.map(data, function(d){return(d.Category)}).keys()
+  //Create Y axis label
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("y", 0-margin.left)
+    .attr("x",0 - (height / 2))
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text(yAxisLabel);  
+  
 
-              // add the options to the button
-              d3.select("#selectButton")
-                .selectAll('myOptions')
-                .data(allGroup)
-                .enter()
-                .append('option')
-                .text(function (d) { return d; }) // text showed in the menu
-                .attr("value", function (d) { return d; }) // corresponding value returned by the button
+  // List of groups
+  var allGroup = d3.map(data, function(d){return(d.Category)}).keys()
 
-              // add the x Axis
-              var x = d3.scaleLinear()
-                .domain([0, 5])
-                .range([0, width]);
-              svg.append("g")
-                  .attr("transform", "translate(0," + height + ")")
-                  .call(d3.axisBottom(x));
+  // add the options to the button
+  d3.select("#selectButton")
+    .selectAll('myOptions')
+    .data(allGroup)
+    .enter()
+    .append('option')
+    .text(function (d) { return d; }) // text showed in the menu
+    .attr("value", function (d) { return d; }) // corresponding value returned by the button
 
-              // add the y Axis
-              var y = d3.scaleLinear()
-                        .range([height, 0])
-                        .domain([0, 0.4]);
-              svg.append("g")
-                  .call(d3.axisLeft(y));
+  // add the x Axis
+  var x = d3.scaleLinear()
+    .domain([0, 5])
+    .range([0, width]);
+  svg.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
 
-              // Compute kernel density estimation for the first group called International Stocks
-              var kde = kernelDensityEstimator(kernelEpanechnikov(3), x.ticks(140))
-              var density =  kde( data
-                .filter(function(d){ return d.Category == "International Stocks"})
-                .map(function(d){  return +d.Expense_ratio; })
-              )
+  // add the y Axis
+  var y = d3.scaleLinear()
+            .range([height, 0])
+            .domain([0, 0.4]);
+  svg.append("g")
+      .call(d3.axisLeft(y));
 
-              // Plot the area
-              var curve = svg
-                .append('g')
-                .append("path")
-                  .attr("class", "mypath")
-                  .datum(density)
-                  .attr("fill", "#69b3a2")
-                  .attr("opacity", ".8")
-                  .attr("stroke", "#000")
-                  .attr("stroke-width", 1)
-                  .attr("stroke-linejoin", "round")
-                  .attr("d",  d3.line()
-                    .curve(d3.curveBasis)
-                      .x(function(d) { return x(d[0]); })
-                      .y(function(d) { return y(d[1]); })
-                  );
+  // Compute kernel density estimation for the first group called Setosa
+  var kde = kernelDensityEstimator(kernelEpanechnikov(3), x.ticks(140))
+  var density =  kde( data
+    .filter(function(d){ return d.Category == "International Stocks"})
+    .map(function(d){  return +d.Expense_ratio; })
+  )
 
-              // A function that update the chart when slider is moved
-              function updateChart(selectedGroup) {
-                // recompute density estimation
-                kde = kernelDensityEstimator(kernelEpanechnikov(3), x.ticks(40))
-                var density =  kde( data
-                  .filter(function(d){ return d.Category == selectedGroup})
-                  .map(function(d){  return +d.Expense_ratio; })
-                )
+  // Plot the area
+  var curve = svg
+    .append('g')
+    .append("path")
+      .attr("class", "mypath")
+      .datum(density)
+      .attr("fill", "#69b3a2")
+      .attr("opacity", ".8")
+      .attr("stroke", "#000")
+      .attr("stroke-width", 1)
+      .attr("stroke-linejoin", "round")
+      .attr("d",  d3.line()
+        .curve(d3.curveBasis)
+          .x(function(d) { return x(d[0]); })
+          .y(function(d) { return y(d[1]); })
+      );
 
-                // update the chart
-                curve
-                  .datum(density)
-                  .transition()
-                  .duration(1000)
-                  .attr("d",  d3.line()
-                    .curve(d3.curveBasis)
-                      .x(function(d) { return x(d[0]); })
-                      .y(function(d) { return y(d[1]); })
-                  );
-              }
+  // A function that update the chart when slider is moved?
+  function updateChart(selectedGroup) {
+    // recompute density estimation
+    kde = kernelDensityEstimator(kernelEpanechnikov(3), x.ticks(40))
+    var density =  kde( data
+      .filter(function(d){ return d.Category == selectedGroup})
+      .map(function(d){  return +d.Expense_ratio; })
+    )
 
-              // Listen to the slider
-              d3.select("#selectButton").on("change", function(d){
-                selectedGroup = this.value
-                updateChart(selectedGroup)
-              })
+    // update the chart
+    curve
+      .datum(density)
+      .transition()
+      .duration(1000)
+      .attr("d",  d3.line()
+        .curve(d3.curveBasis)
+          .x(function(d) { return x(d[0]); })
+          .y(function(d) { return y(d[1]); })
+      );
+  }
 
-            });
+  // Listen to the slider?
+  d3.select("#selectButton").on("change", function(d){
+    selectedGroup = this.value
+    updateChart(selectedGroup)
+  })
+
+});
 
 
-            // Function to compute density
-            function kernelDensityEstimator(kernel, X) {
-              return function(V) {
-                return X.map(function(x) {
-                  return [x, d3.mean(V, function(v) { return kernel(x - v); })];
-                });
-              };
-            }
-            function kernelEpanechnikov(k) {
-              return function(v) {
-                return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
-              };
-            }
+// Function to compute density
+function kernelDensityEstimator(kernel, X) {
+  return function(V) {
+    return X.map(function(x) {
+      return [x, d3.mean(V, function(v) { return kernel(x - v); })];
+    });
+  };
+}
+function kernelEpanechnikov(k) {
+  return function(v) {
+    return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
+  };
+}
 
-          </script>
+</script>
 
-          <!-- Initialize a select button -->
-          <p></p>
-          <p>
-            <label>Change Category of Mutual Funds</label>
-            <select id="selectButton"></select>
-          </p>
-
-        </div>
+<!-- Initialize a select button -->
+<select id="selectButton"></select>
+        
+    </div>
 
     <div class="col-sm-8 text-left">
         <h3>Description of Findings</h3>
-        <p>
-          In this section, I have plotted a kernel density plot of the expense ratio of the mutual funds, 
-          based on the Category of the mutual funds.The expense ratio is a measure of the total percentage 
-          of fund assets used for operating costs/ all expenses. 
-        </p>
-        <p>
-          The kernel density plot shows that the distribution of the expense ratios of various companies is skewed to the left.
-          This means that most companies have their expense ratio below 2.5. This shows that most of the companies are trying to 
-          operate at a low expense ratio, as an expense ratio of over 1.5 is considered high.
-        </p>
-        <p>
-          The density plot depicts a skewed left distribution of the expense ratio, for each change to the Category of the mutual funds.
-        </p>
-
+        <p>thshsh fdujd vhc hgjks </p>
     </div>
     </div>
     <div class="col-sm-2 sidenav">
