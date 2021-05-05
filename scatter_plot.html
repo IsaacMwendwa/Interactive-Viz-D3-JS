@@ -67,115 +67,118 @@
   <div class="row content">
     <div class="col-sm-2 sidenav">
       <p><b>Background Information</b></p>
-      <p>
+      <p>Data Source: a1-grocerystoresurvey.csv</p>
+      <p>The interactivity of the scatter plot is explored by adjusting the limits of the
+      X-axis, in steps of 10,000, or to whichever value is desired.</p>
+      <p>This gives a closer inspection of the Visualization</p>
     </div>
 
     <div class="col-sm-8 text-left"> 
         <h1>Visualization Programming using D3.js: Scatter Plot</h1>
 
-     <!-- Create a div where the graph will take place -->
+     <!--div where the graph will take place -->
     <div id="my_dataviz">
     <script>
 
-// set the dimensions and margins of the graph
-var margin = {top: 10, right: 30, bottom: 30, left: 60},
-    width = 460 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+      // set the dimensions and margins of the graph
+      var margin = {top: 10, right: 30, bottom: 30, left: 60},
+          width = 460 - margin.left - margin.right,
+          height = 400 - margin.top - margin.bottom;
 
-// append the svg object to the body of the page
-var svg = d3.select("#my_dataviz")
-  .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
+      // append the svg object to the body of the page
+      var svg = d3.select("#my_dataviz")
+        .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+          .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
 
-//Read the data
-d3.csv("https://raw.githubusercontent.com/IsaacMwendwa/dataViz/main/a1-grocerystoresurvey.csv", function(data) {
+      //Read the data
+      d3.csv("https://raw.githubusercontent.com/IsaacMwendwa/dataViz/main/a1-grocerystoresurvey.csv", function(data) {
 
-  // Defining graph title and axis labels
-  const xAxisLabel = "Income";
-  const yAxisLabel = "PurchaseAmount";
-  const title = `Scatter Plot of ${yAxisLabel} vs ${xAxisLabel}`;
-  
-  // Add X axis
-  var x = d3.scaleLinear()
-    .domain([0, 100000])
-    .range([ 0, width ]);
-  var xAxis = svg.append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
-    
+        // Defining graph title and axis labels
+        const xAxisLabel = "Income";
+        const yAxisLabel = "PurchaseAmount";
+        const title = `Scatter Plot of ${yAxisLabel} vs ${xAxisLabel}`;
+        
+        // Add X axis
+        var x = d3.scaleLinear()
+          .domain([0, 100000])
+          .range([ 0, width ]);
+        var xAxis = svg.append("g")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x));
+          
 
-  // Add Y axis
-  var y = d3.scaleLinear()
-    .domain([0, 700])
-    .range([ height, 0]);
-  svg.append("g")
-    .call(d3.axisLeft(y));
-
-
-  //Create Title 
-  svg.append("text")
-    .attr("x", width / 2 )
-    .attr("y", 0)
-    .style("text-anchor", "middle")
-    .text(title);
-
-  //Create X axis label   
-  svg.append("text")
-    .attr("x", width / 2 )
-    .attr("y",  height + margin.bottom)
-    .style("text-anchor", "middle")
-    .text(xAxisLabel);
-
-  //Create Y axis label
-  svg.append("text")
-    .attr("transform", "rotate(-90)")
-    .attr("y", 0-margin.left)
-    .attr("x",0 - (height / 2))
-    .attr("dy", "1em")
-    .style("text-anchor", "middle")
-    .text(yAxisLabel);  
-
-  // Add dots
-  svg.append('g')
-    .selectAll("dot")
-    .data(data)
-    .enter()
-    .append("circle")
-      .attr("cx", function (d) { return x(d.Income); } )
-      .attr("cy", function (d) { return y(d.PurchaseAmount); } )
-      .attr("r", 5)
-      .style("fill", "#69b3a2" )
+        // Add Y axis
+        var y = d3.scaleLinear()
+          .domain([0, 700])
+          .range([ height, 0]);
+        svg.append("g")
+          .call(d3.axisLeft(y));
 
 
-  // A function that update the plot for a given xlim value
-  function updatePlot() {
+        //Create Title 
+        svg.append("text")
+          .attr("x", width / 2 )
+          .attr("y", 0)
+          .style("text-anchor", "middle")
+          .text(title);
 
-    // Get the value of the button
-    xlim = this.value
+        //Create X axis label   
+        svg.append("text")
+          .attr("x", width / 2 )
+          .attr("y",  height + margin.bottom)
+          .style("text-anchor", "middle")
+          .text(xAxisLabel);
 
-    // Update X axis
-    x.domain([3,xlim])
-    xAxis.transition().duration(1000).call(d3.axisBottom(x))
+        //Create Y axis label
+        svg.append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 0-margin.left)
+          .attr("x",0 - (height / 2))
+          .attr("dy", "1em")
+          .style("text-anchor", "middle")
+          .text(yAxisLabel);  
 
-    // Update chart
-    svg.selectAll("circle")
-       .data(data)
-       .transition()
-       .duration(1000)
-       .attr("cx", function (d) { return x(d.Income); } )
-       .attr("cy", function (d) { return y(d.PurchaseAmount); } )
-  }
+        // Add dots
+        svg.append('g')
+          .selectAll("dot")
+          .data(data)
+          .enter()
+          .append("circle")
+            .attr("cx", function (d) { return x(d.Income); } )
+            .attr("cy", function (d) { return y(d.PurchaseAmount); } )
+            .attr("r", 5)
+            .style("fill", "#69b3a2" )
 
-  // Add an event listener to the button created in the html part
-  d3.select("#buttonXlim").on("input", updatePlot )
 
-})
+        // A function that update the plot for a given xlim value
+        function updatePlot() {
 
-</script>
+          // Get the value of the button
+          xlim = this.value
+
+          // Update X axis
+          x.domain([3,xlim])
+          xAxis.transition().duration(1000).call(d3.axisBottom(x))
+
+          // Update chart
+          svg.selectAll("circle")
+            .data(data)
+            .transition()
+            .duration(1000)
+            .attr("cx", function (d) { return x(d.Income); } )
+            .attr("cy", function (d) { return y(d.PurchaseAmount); } )
+        }
+
+        // Add an event listener to the button created in the html part
+        d3.select("#buttonXlim").on("input", updatePlot )
+
+      })
+
+    </script>
 
 <!-- Add a radio button -->
 <label>Change X-axis Limits</label>
@@ -185,7 +188,11 @@ d3.csv("https://raw.githubusercontent.com/IsaacMwendwa/dataViz/main/a1-groceryst
 
     <div class="col-sm-8 text-left">
         <h3>Description of Findings</h3>
-        <p>thshsh fdujd vhc hgjks </p>
+        <p>The scatter plot of PurchaseAmount versus Income yields a closely knit plot, depicting that 
+        the two variables are strongly correlated.</p>
+        <p>The scatter plot also shows that when there is a weak correlation between income and PurchaseAmount,
+         when the PurchaseAmount exceeds 250</p>
+        <p></p>
     </div>
     </div>
     <div class="col-sm-2 sidenav">
