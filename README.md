@@ -1,5 +1,7 @@
 # data-Viz-D3-JS
 
+## Current App Link: https://data-viz-d3.herokuapp.com/
+
 ## Introduction
 This website contains five visualization charts of five datasets, implemented in D3.js. The five visualizations are:
 1. Bubble Plot
