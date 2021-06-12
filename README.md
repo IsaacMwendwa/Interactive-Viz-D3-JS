@@ -1,4 +1,4 @@
-# data-Viz-D3-JS
+# Interactive-Viz-D3-JS
 
 ### Current App Link: https://data-viz-d3.herokuapp.com/
 
